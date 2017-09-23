@@ -1,0 +1,23 @@
+html
+    include head.pug
+
+    body(class="text-center" id="create")
+        form(method="post" action="/create")
+            div
+                p(class="inputfields") Date of Request
+            div
+                input(type='text' id="datefield" name='requestDate')
+            div
+                p(class="inputfields") Request Title
+            div
+                input(type='text' id="titlefield" name="requestTitle")
+            div
+                p(class="inputfields") Request Description
+            div
+                textarea(id="descfield" name="requestDesc")
+            div
+                button(type="submit" class="btn") Submit Request
+        
+    a(href="/") Return to Home
+
+    include footer.pug

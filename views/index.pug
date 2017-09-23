@@ -1,0 +1,24 @@
+html
+  include head.pug
+  body
+    div(class="container text-center")
+      div(class="row")
+        div(class="col-xs-4 text-center" id="home-left")
+          div(id="widget-calendar" class="widget")
+            h2 Events Today
+            p #{title}
+
+          div(id="widget-owes" class="widget")
+            h2 Money
+            div
+              p You owe <i>Zach</i> some money
+
+        div(class="col-xs-8 text-center")
+          iframe(src="https://calendar.google.com/calendar/embed?src=hhk4p0grulg88hlu7bbvg8g12k%40group.calendar.google.com&ctz=America/New_York" style="border: 0" width="800" height="600" frameborder="0" scrolling="no")
+          
+        
+          
+
+  include footer.pug
+          
+  

@@ -1,0 +1,49 @@
+html
+    include head.pug
+
+    body(class="text-center" id="alltickets")
+        h2 Incomplete Requests
+        table(class="table table-striped incomplete-table text-center")
+            tr 
+                th Title
+                th Date Requested
+                th Description
+                th Assigned Tech
+                th Notes
+            each ticket in tickets
+                if !ticket.completed
+                    tr(id=ticket.id)
+                        td=ticket.requestTitle
+                        td=ticket.requestDate
+                        td=ticket.requestDesc
+                        td=ticket.assignedTech
+                        td
+                            if(ticket.notes != null)
+                                div(class="notes")
+                                    pre=ticket.notes
+                
+        h2 Completed Requests
+        table(class="table table-striped complete-table text-center")
+            tr 
+                th Title
+                th Date Requested
+                th Description
+                th Assigned Tech
+                th Completion Date  
+                th Notes
+            each ticket in tickets
+                if ticket.completed
+                    tr(id=ticket.id)
+                        td=ticket.requestTitle
+                        td=ticket.requestDate
+                        td=ticket.requestDesc
+                        td=ticket.assignedTech
+                        td=ticket.completionDate
+                        td
+                            if(ticket.notes != null)
+                                div(class="notes")
+                                    pre=ticket.notes
+
+    a(href="/") Return to Home
+
+    include footer.pug

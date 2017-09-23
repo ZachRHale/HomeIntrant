@@ -1,0 +1,25 @@
+{
+  "name": "dunedin-intranet",
+  "productName": "Dunedin House Intranet",
+  "version": "1.0.0",
+  "description": "An intranet to help us organize our home",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "guid": "0.0.12",
+    "mysql": "^2.14.1",
+    "pug": "^2.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.16.5",
+    "@types/express": "^4.0.37",
+    "@types/node": "^8.0.28",
+    "@types/pug": "^2.0.4",
+    "typescript": "^2.5.2"
+  }
+}
