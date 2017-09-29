@@ -9,11 +9,23 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "dependencies": {
+    "@types/express-session": "^1.15.3",
+    "@types/mysql": "0.0.34",
+    "@types/passport": "^0.3.4",
     "body-parser": "^1.17.2",
+    "bootstrap": "^3.3.7",
+    "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
+    "express-mysql-session": "^1.2.2",
+    "express-session": "^1.15.5",
+    "font-awesome": "^4.7.0",
+    "google-auth-library": "^0.11.0",
+    "googleapis": "^22.1.0",
     "guid": "0.0.12",
     "mysql": "^2.14.1",
-    "pug": "^2.0.0-rc.2"
+    "passport": "^0.4.0",
+    "pug": "^2.0.0-rc.2",
+    "randomstring": "^1.1.5"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.5",

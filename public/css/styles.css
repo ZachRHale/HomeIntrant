@@ -42,9 +42,59 @@
     border:1px solid black;
 }
 
-.inputfields {
+.bill {
+    display:inline-block;
+    border: 1px solid gray;
+    padding:20px;
+    margin:15px;
+    border-radius:10px;
+}
+
+#loginHeader {
+    padding:20px;
+    position:absolute;
+    right:0;
+    top:0;
+}
+
+#loginHeader button {
+    margin:10px;
+}
+
+#linksHeader li {
+    display:inline-block;
+    padding: 5px 20px;
+    border:1px solid gray;
+    margin:10px;
+}
+.water {
+    background-color:#00B7FF;
+    color:black;
+}
+
+.electric {
+    background-color:#FFFF8F;
+    color:black;
+}
+
+.internet {
+    background-color:lightgray
+}
+
+.form-control {
     margin:0 10px;
-    padding-top:20px
+    padding:20px;
+    text-align:center;
+    font-size: 16px;
+    position:relative;
+}
+
+.form-group {
+    margin:0 40%;
+}
+
+#submitBtn {
+    margin-top:30px;
 }
 
 footer {
@@ -53,6 +103,14 @@ footer {
     left:0;
     width:100%;
     background-color:white
+}
+
+#createFailMessage {
+    background-color: rgb(218, 2, 2);
+    color: #FCC9C9;
+    padding: 30px;
+    margin: 0 20%;
+    border-radius: 10px;
 }
 
 
@@ -64,3 +122,6 @@ footer {
     padding:10px;
 }
 
+body {
+    position:relative;
+}

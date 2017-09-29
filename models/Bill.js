@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Bill = /** @class */ (function () {
-    function Bill(id, type, dueDate, amount) {
+    function Bill(id, type, dueDate, amount, paid) {
         this.id = id;
         this.type = type;
         this.amount = amount;
         this.duedate = dueDate;
+        this.paid = paid;
     }
     return Bill;
 }());

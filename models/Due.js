@@ -5,7 +5,7 @@ var Due = /** @class */ (function () {
         this.debtor = debtor.id;
         this.creditor = creditor.id;
         this.bill = bill.id;
-        this.amount = bill.amount.value;
+        this.amount = bill.amount;
         this.paid = paid;
     }
     return Due;

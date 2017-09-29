@@ -1,0 +1,19 @@
+html
+  include head.pug
+  body(class="text-center" id="login")
+    form(method="post" action="/login")
+            div(class="form-group")
+                label(class="titlefield" for="username") 
+                    h3 Username
+                div(style="position:relative")
+                    input(type='text' class="form-control" name = "username" id = "username")
+            div(class="form-group")
+                label(class="titlefield" for="password") 
+                    h3 Password
+                input(type='password' class="form-control" name = "password" id = "password")    
+            div
+                button(type="submit" class="btn" id="submitBtn") LogIn
+                  
+  include footer.pug
+          
+  

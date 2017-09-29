@@ -1,22 +1,30 @@
 html
     include head.pug
 
-    body(class="text-center" id="create")
-        form(method="post" action="/create")
+    body(class="text-center" id="createUser")
+        div(id="createFailMessage" class= display )
+            p <b>#{username}</b> is already taken.  Please choose a different username
+
+        form(method="post" action="/user/create")
+            div(class="form-group")
+                label(class="titlefield" for="firstname") 
+                    h3 First Name
+                div(style="position:relative")
+                    input(type='text' class="form-control" name="firstname" id = "firstname" value = firstname )
+            div(class="form-group")
+                label(class="titlefield" for="lastname") 
+                    h3 Last Name
+                input(type='text' class="form-control" name="lastname" id="lastname" value = lastname )    
+            div(class="form-group")
+                label(class="titlefield") 
+                    h3 User Name
+                input(type='text' class="form-control" name="username" id="username")
+            div(class="form-group")
+                label(class="titlefield") 
+                    h3 Password
+                input(type='password' class="form-control" name="password")
             div
-                p(class="inputfields") Date of Request
-            div
-                input(type='text' id="datefield" name='requestDate')
-            div
-                p(class="inputfields") Request Title
-            div
-                input(type='text' id="titlefield" name="requestTitle")
-            div
-                p(class="inputfields") Request Description
-            div
-                textarea(id="descfield" name="requestDesc")
-            div
-                button(type="submit" class="btn") Submit Request
+                button(type="submit" class="btn" id="submitBtn") Create Account
         
     a(href="/") Return to Home
 

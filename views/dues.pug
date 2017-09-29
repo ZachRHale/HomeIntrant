@@ -1,0 +1,30 @@
+html
+    include head.pug
+
+    body(class="text-center" id="all-dues")
+        div(class="container")
+            div(class="row")
+                div(class="col-md-6" style="border-right: 1px solid lightgray")
+                    h2 Dues You Owe
+                    table(id="dues-owed" class="table table-striped text-center")
+                        each due in dues
+                            if (userid == due.debtor_id)
+                                tr(class="due")  
+                                    td You owe #{due.creditor_firstname} #{due.amount} for #{due.type}
+                    h2(style="color:red") -$#{due}
+                div(class="col-md-6")
+                    h2 Dues Owed to You
+                    table(id="dues-owed" class="table table-striped text-center")
+                        each due in dues
+                            if (userid == due.creditor_id)
+                                tr(class="due")  
+                                    td #{due.debtor_firstname} owes you #{due.amount} for #{due.type}
+                    h2(style="color:green") +$#{owed}
+        
+        div
+            if (totalAmount < 0)
+                
+                        
+        a(href="/") Return to Home
+
+    include footer.pug

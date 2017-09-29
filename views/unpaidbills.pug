@@ -1,0 +1,23 @@
+html
+    include head.pug
+
+    body(class="text-center" id="unpaid-bills")
+
+        h2 Unpaid Bills
+        div(id="bills")
+            each bill in bills
+                div(class="bill " + bill.type)  
+                    h2
+                        if bill.type == "electric"
+                            i(class="fa fa-lightbulb-o " aria-hidden="true")
+                        if bill.type == "water"
+                            i(class="fa fa-tint" aria-hidden="true")
+                        if bill.type == "internet"
+                            i(class="fa fa-microchip" aria-hidden="true")
+                    h4= (parseInt(new Date(bill.duedate).getMonth()) + 1) + " / " + new Date(bill.duedate).getDate() + " / " + new Date(bill.duedate).getFullYear()
+                    h1="$" + bill.amount + " " + bill.currency
+                        
+                       
+        a(href="/") Return to Home
+
+    include footer.pug
