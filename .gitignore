@@ -1,1 +1,4 @@
 /node_modules/
+private.key
+certificate.pem
+cert.csr

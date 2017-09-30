@@ -5,7 +5,7 @@ import * as randomstring from 'randomstring'
 import * as crypto from 'crypto'
 import * as express from 'express'
 import * as mysql from 'mysql'
-
+import { createDues } from './utility'
 
 export default function setupRoutes(app: express.Application) {
     app.get('/', (req, res) => {
@@ -196,5 +196,58 @@ export default function setupRoutes(app: express.Application) {
         }
     })
 
+    app.get('/bills/create', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+
+        if (loggedIn) {            
+            res.render(__dirname + '/views/createbill', { })
+        } else {
+            res.redirect('/login')
+        }
+    })
+
+    app.post('/bills/create', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+
+        if (loggedIn) {
+            let billid = Guid.create()
+            let currency = "USD"
+
+            let queryString = 'INSERT INTO Bills (id, duedate, type, currency, amount, paid, owner) VALUES ("' + billid + '","' + req.body.duedate + '","' + req.body.type + '","' + currency + '","'+ req.body.amount +'", false, "' + req.user.username +'")'
+
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+
+            connection.connect()
+            connection.query(queryString, (err, rows:Array<any>) => {  
+                
+                if (err) {
+
+                } else {
+                    console.log(req.body.users)
+                    let query = createDues(billid, req)
+                    connection.query(query, (err, rows:Array<any>) => {
+                        if (err) {
+                            console.log('There was an error creating the dues')
+                            console.log(err)
+                        } else {
+                            res.render(__dirname + '/views/createbillsuccess', { display: "hide", loggedIn: loggedIn, billtype: req.body.type, billamount: req.body.amount, billduedate: req.body.duedate }) 
+                        }
+
+                    })
+
+                }
+                connection.end()
+            })
+        } else {
+            res.redirect('/login')
+        }
+    })
+
     return app
 }
+
+

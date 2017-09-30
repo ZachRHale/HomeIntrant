@@ -4,6 +4,7 @@ var Guid = require("Guid");
 var randomstring = require("randomstring");
 var crypto = require("crypto");
 var mysql = require("mysql");
+var utility_1 = require("./utility");
 function setupRoutes(app) {
     app.get('/', function (req, res) {
         var loggedIn = req.isAuthenticated();
@@ -163,6 +164,50 @@ function setupRoutes(app) {
                 totalAmount = due - owed;
                 res.render(__dirname + '/views/dues', { display: "hide", loggedIn: loggedIn, name: name_2, dues: rows, userid: userid_1, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount });
                 connection_1.end();
+            });
+        }
+        else {
+            res.redirect('/login');
+        }
+    });
+    app.get('/bills/create', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            res.render(__dirname + '/views/createbill', {});
+        }
+        else {
+            res.redirect('/login');
+        }
+    });
+    app.post('/bills/create', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            var billid_1 = Guid.create();
+            var currency = "USD";
+            var queryString = 'INSERT INTO Bills (id, duedate, type, currency, amount, paid, owner) VALUES ("' + billid_1 + '","' + req.body.duedate + '","' + req.body.type + '","' + currency + '","' + req.body.amount + '", false, "' + req.user.username + '")';
+            var connection_2 = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+            connection_2.connect();
+            connection_2.query(queryString, function (err, rows) {
+                if (err) {
+                }
+                else {
+                    console.log(req.body.users);
+                    var query = utility_1.createDues(billid_1, req);
+                    connection_2.query(query, function (err, rows) {
+                        if (err) {
+                            console.log('There was an error creating the dues');
+                            console.log(err);
+                        }
+                        else {
+                            res.render(__dirname + '/views/createbillsuccess', { display: "hide", loggedIn: loggedIn, billtype: req.body.type, billamount: req.body.amount, billduedate: req.body.duedate });
+                        }
+                    });
+                }
+                connection_2.end();
             });
         }
         else {

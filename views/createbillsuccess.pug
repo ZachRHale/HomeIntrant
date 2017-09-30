@@ -1,0 +1,10 @@
+html
+    include head.pug
+
+    body(class="text-center")
+        div(class="container text-center")
+            p Successfully created the bill for #{ billtype } #{ parseFloat(billamount).toFixed(2) } due on #{ billduedate }
+          
+
+    include footer.pug
+          

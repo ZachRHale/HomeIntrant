@@ -8,14 +8,16 @@ html
             each bill in bills
                 div(class="bill " + bill.type)  
                     h2
-                        if bill.type == "electric"
-                            i(class="fa fa-lightbulb-o " aria-hidden="true")
+                        if bill.type == "electricy"
+                            i(class="fa fa-bolt" aria-hidden="true")
                         if bill.type == "water"
                             i(class="fa fa-tint" aria-hidden="true")
-                        if bill.type == "internet"
-                            i(class="fa fa-microchip" aria-hidden="true")
+                        if bill.type == "spectrum"
+                            i(class="fa fa-wifi" aria-hidden="true")
+                        if bill.type == "rent"
+                            i(class="fa fa-home" aria-hidden="true")
                     h4= (parseInt(new Date(bill.duedate).getMonth()) + 1) + " / " + new Date(bill.duedate).getDate() + " / " + new Date(bill.duedate).getFullYear()
-                    h1="$" + bill.amount + " " + bill.currency
+                    h1="$" + parseFloat(bill.amount).toFixed(2) + " " + bill.currency
                         
                        
         a(href="/") Return to Home

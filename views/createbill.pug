@@ -1,0 +1,44 @@
+html
+  include head.pug
+  body(class="text-center" id="create-bill")
+    form(method="post" action="/bills/create")
+            div(class="form-group")
+                label(class="titlefield" for="type") 
+                    h3 Bill Type
+                select(style="position:relative" name = "type" id = "type" class="form-control")
+                    option(value="electricy") Electricity
+                    option(value="water") Water
+                    option(value="spectrum") Spectrum
+                    option(value="rent") Rent
+            div(class="form-group")
+                label(class="titlefield" for="amount") 
+                    h3 Amount
+                input(type='number' min="0.01" step="0.01" value="0.00" class="form-control" name = "amount" id = "amount")  
+
+            div(class="form-group")
+                label(class="titlefield" for="duedate") 
+                    h3 Due Date
+                input(type='date' class="form-control" name = "duedate" id = "duedate") 
+
+            div(class="form-group")
+                label(class="titlefield" for="users") 
+                    h3 Users on Bill
+            div
+                div(style="display:inline-block; border:1px solid black; margin: 10px; padding:10px; border-radius:10px")
+                    span Zachary Hale
+                    i(class="fa fa-times" aria-hidden="true" style="margin-left: 10px ")
+                    input(type='hidden' style="display:inline-block; width:auto" readonly class="form-control" name = "users[creditor][0]" value = '45453604-42f0-359f-0926-83c32d257471')  
+                div(style="display:inline-block; border:1px solid black; margin: 10px; padding:10px; border-radius:10px")
+                    span Bob Smith
+                    i(class="fa fa-times" aria-hidden="true" style="margin-left: 10px ")
+                    input(type='hidden' style="display:inline-block; width:auto" readonly class="form-control" name = "users[debtor][0]" value = '92fbebcc-ba93-c594-9b4b-adb09329f3d8') 
+                div(style="display:inline-block; border:1px solid black; margin: 10px; padding:10px; border-radius:10px")
+                    span Joe Roma
+                    i(class="fa fa-times" aria-hidden="true" style="margin-left: 10px")
+                    input(type='hidden' style="display:inline-block; width:auto" readonly class="form-control" name = "users[debtor][1]" value = '8ba15e7b-d09c-202a-5d7d-ea08cd154d2a')   
+            div
+                button(type="submit" class="btn" id="submitBtn") Create Bill
+                  
+  include footer.pug
+          
+  

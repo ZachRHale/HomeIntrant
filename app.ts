@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser'
 import * as MySQLStore from 'express-mysql-session'
 import * as expressSession from 'express-session'
 import * as passport from 'passport'
+
 //Middleware
 import * as pug from 'pug'
 
@@ -11,7 +12,7 @@ export default function createApp() {
 
     let app = express();
 
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
 
     //Setup our static location (aka wwwroot)

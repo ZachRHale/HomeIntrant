@@ -8,7 +8,7 @@ var expressSession = require("express-session");
 var passport = require("passport");
 function createApp() {
     var app = express();
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     //Setup our static location (aka wwwroot)
     app.use(express.static(__dirname + '/public'));

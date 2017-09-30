@@ -28,19 +28,22 @@ CREATE TABLE IF NOT EXISTS Users (
     UNIQUE (id)
  );
  
+  
  CREATE TABLE IF NOT EXISTS Dues (
+	id varchar(255) NOT NULL,
 	bill varchar(255) NOT NULL,
     debtor varchar(255) NOT NULL, 
 	creditor varchar(255) NOT NULL,
     amount float,
     paid boolean,
-    PRIMARY KEY (bill)
+    PRIMARY KEY (id),
+    foreign key (bill) references Bills(id)
  );
  
 CREATE VIEW v_dues_information AS
 SELECT d.bill,
 b.type,
-b.amount,
+d.amount,
 b.currency,
 u.firstname AS debtor_firstname, 
 u.lastname AS debtor_lastname,
