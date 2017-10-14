@@ -1,0 +1,9 @@
+h2 Dues You Owe
+table(class="table table-striped text-center")
+    each due in dues
+        if (userid == due.debtor_id)
+            tr(class="due")  
+                td You owe #{due.creditor_firstname} #{due.amount.toFixed(2)} for #{due.type} 
+                    span(emoji="pile-of-poo" emoji-tone="light")
+                    button(class="btn btn-success pay-due") Pay
+h2(style="color:red") -$#{due}

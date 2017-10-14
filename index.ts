@@ -23,7 +23,6 @@ let httpsOptions = {
     cert: fs.readFileSync('certificate.pem')
 }
 
-
 let app = createApp()
 setupRoutes(app)
 

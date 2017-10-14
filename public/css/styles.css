@@ -81,6 +81,27 @@
     background-color:#D0A0F1
 }
 
+.creditor .role {
+    font-size: 10px;
+    color:green;
+}
+
+.debitor .role {
+    font-size: 10px;
+    color:red;
+}
+.user-bill {
+    display:inline-block; 
+    border:1px solid black; 
+    margin: 10px; 
+    padding:10px; 
+    border-radius:10px;
+}
+
+.user-bill .fa-times {
+    margin-left: 10px; z-index:999; cursor:pointer;
+}
+
 .form-control {
     margin:0 10px;
     padding:20px;
@@ -91,6 +112,10 @@
 
 .form-group {
     margin:0 40%;
+}
+
+.pay-due {
+    margin-left:20px;
 }
 
 #submitBtn {

@@ -10,6 +10,7 @@
   "license": "CC0-1.0",
   "dependencies": {
     "@types/express-session": "^1.15.3",
+    "@types/jquery": "^3.2.12",
     "@types/mysql": "0.0.34",
     "@types/passport": "^0.3.4",
     "body-parser": "^1.17.2",
@@ -26,15 +27,27 @@
     "https": "^1.0.0",
     "mysql": "^2.14.1",
     "passport": "^0.4.0",
-    "pug": "^2.0.0-rc.2",
+    "pug": "^2.0.0-rc.4",
     "randomstring": "^1.1.5"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.5",
     "@types/express": "^4.0.37",
+    "@types/jqueryui": "^1.11.37",
     "@types/node": "^8.0.28",
     "@types/pug": "^2.0.4",
     "css-emojis": "^0.1.0",
-    "typescript": "^2.5.2"
+    "css-loader": "^0.28.7",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^2.30.1",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
+    "node-sass": "^4.5.3",
+    "pug-cli": "^1.0.0-alpha6",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.18.2",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.5.2",
+    "webpack": "^3.6.0"
   }
 }

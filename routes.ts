@@ -173,10 +173,10 @@ export default function setupRoutes(app: express.Application) {
             });
 
             connection.connect()
-            connection.query(queryString, (err, rows:Array<any>) => {   
-                let due:number = 0
-                let owed:number = 0
-                let totalAmount:number = 0
+            connection.query(queryString, (err, rows: Array<any>) => {
+                let due: number = 0
+                let owed: number = 0
+                let totalAmount: number = 0
 
                 rows.forEach((row) => {
                     if (row.debtor_id == userid) {
@@ -184,11 +184,11 @@ export default function setupRoutes(app: express.Application) {
                     } else {
                         owed += parseFloat(row.amount)
                     }
-                })     
+                })
 
                 totalAmount = due - owed
 
-                res.render(__dirname + '/views/dues', { display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due:due.toFixed(2), owed:owed.toFixed(2), totalAmount:totalAmount })
+                res.render(__dirname + '/views/dues', { display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount })
                 connection.end()
             })
         } else {
@@ -196,11 +196,19 @@ export default function setupRoutes(app: express.Application) {
         }
     })
 
+    app.post('/bills/dues/pay', (req, res) => {
+
+    })
+
+
+
+
     app.get('/bills/create', (req, res) => {
         let loggedIn = req.isAuthenticated()
 
-        if (loggedIn) {            
-            res.render(__dirname + '/views/createbill', { })
+        if (loggedIn) {
+
+            res.render(__dirname + '/views/createbill', { creditor: req.user})
         } else {
             res.redirect('/login')
         }
@@ -212,8 +220,10 @@ export default function setupRoutes(app: express.Application) {
         if (loggedIn) {
             let billid = Guid.create()
             let currency = "USD"
+            console.log(req.body.users)
+            console.log(req.user)
 
-            let queryString = 'INSERT INTO Bills (id, duedate, type, currency, amount, paid, owner) VALUES ("' + billid + '","' + req.body.duedate + '","' + req.body.type + '","' + currency + '","'+ req.body.amount +'", false, "' + req.user.username +'")'
+            let queryString = 'INSERT INTO Bills (id, duedate, type, currency, amount, paid, owner) VALUES ("' + billid + '","' + req.body.duedate + '","' + req.body.type + '","' + currency + '","' + req.body.amount + '", false, "' + req.user.id + '")'
 
             let connection = mysql.createConnection({
                 host: 'localhost',
@@ -222,24 +232,86 @@ export default function setupRoutes(app: express.Application) {
             });
 
             connection.connect()
-            connection.query(queryString, (err, rows:Array<any>) => {  
-                
+            connection.query(queryString, (err, rows: Array<any>) => {
+
                 if (err) {
 
                 } else {
-                    console.log(req.body.users)
+                    
                     let query = createDues(billid, req)
-                    connection.query(query, (err, rows:Array<any>) => {
+                    connection.query(query, (err, rows: Array<any>) => {
                         if (err) {
                             console.log('There was an error creating the dues')
                             console.log(err)
                         } else {
-                            res.render(__dirname + '/views/createbillsuccess', { display: "hide", loggedIn: loggedIn, billtype: req.body.type, billamount: req.body.amount, billduedate: req.body.duedate }) 
+                            res.render(__dirname + '/views/createbillsuccess', { display: "hide", loggedIn: loggedIn, billtype: req.body.type, billamount: req.body.amount, billduedate: req.body.duedate })
                         }
 
                     })
 
                 }
+                connection.end()
+            })
+        } else {
+            res.redirect('/login')
+        }
+    })
+
+
+    app.get('/api/users', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+        if (loggedIn) {
+
+            let queryString = 'SELECT firstname, lastname, id FROM Users WHERE id <> "' + req.user.id + '"'
+
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+
+                res.json(JSON.stringify(rows))
+                connection.end()
+            });
+            
+        } else {
+            res.send('You are not authorized to view this page')
+        }
+    })
+
+    app.get('/api/bills/dues', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+        if (loggedIn) {
+            let name = req.user.firstname
+            let userid = req.user.id
+            let queryString = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"'
+
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+                let due: number = 0
+                let owed: number = 0
+                let totalAmount: number = 0
+
+                rows.forEach((row) => {
+                    if (row.debtor_id == userid) {
+                        due += parseFloat(row.amount)
+                    } else {
+                        owed += parseFloat(row.amount)
+                    }
+                })
+
+                totalAmount = due - owed
+
+                res.json({ display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount })
                 connection.end()
             })
         } else {

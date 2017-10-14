@@ -1,13 +1,15 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
+      "allowJs": true,
       "target": "es5",
       "module": "commonjs",
       "sourceMap": true
     },
     "include": [
       "models/*.ts", 
-      "index.ts"
+      "index.ts", 
+      "public/js/*.ts"
     ],
     "exclude": [
       "node_modules"
