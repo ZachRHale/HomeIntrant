@@ -115,6 +115,7 @@ function setupRoutes(app) {
         var loggedIn = req.isAuthenticated();
         if (loggedIn) {
             var name_1 = req.user.firstname;
+            var userid_1 = req.user.id;
             var connection = mysql.createConnection({
                 host: 'localhost',
                 user: 'root',
@@ -127,7 +128,7 @@ function setupRoutes(app) {
                 }
                 else {
                     if (rows != undefined) {
-                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name_1 });
+                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name_1, userid: userid_1 });
                     }
                 }
             });
@@ -141,7 +142,7 @@ function setupRoutes(app) {
         var loggedIn = req.isAuthenticated();
         if (loggedIn) {
             var name_2 = req.user.firstname;
-            var userid_1 = req.user.id;
+            var userid_2 = req.user.id;
             var queryString = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"';
             var connection_1 = mysql.createConnection({
                 host: 'localhost',
@@ -154,7 +155,7 @@ function setupRoutes(app) {
                 var owed = 0;
                 var totalAmount = 0;
                 rows.forEach(function (row) {
-                    if (row.debtor_id == userid_1) {
+                    if (row.debtor_id == userid_2) {
                         due += parseFloat(row.amount);
                     }
                     else {
@@ -162,7 +163,7 @@ function setupRoutes(app) {
                     }
                 });
                 totalAmount = due - owed;
-                res.render(__dirname + '/views/dues', { display: "hide", loggedIn: loggedIn, name: name_2, dues: rows, userid: userid_1, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount });
+                res.render(__dirname + '/views/dues', { display: "hide", loggedIn: loggedIn, name: name_2, dues: rows, userid: userid_2, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount });
                 connection_1.end();
             });
         }
@@ -172,10 +173,63 @@ function setupRoutes(app) {
     });
     app.post('/bills/dues/pay', function (req, res) {
     });
+    app.get('/bills/pay/:id', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            var name_3 = req.user.firstname;
+            var userid = req.user.id;
+            var queryString = "SELECT * FROM Bills WHERE id = '" + req.params.id + "';";
+            var connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+            connection.connect();
+            connection.query(queryString, function (err, rows) {
+                if (rows.length == 0) {
+                    res.render(__dirname + '/views/404', { loggedIn: loggedIn, name: name_3 });
+                }
+                else if (rows[0].owner == req.user.id) {
+                    res.render(__dirname + '/views/paybill', { loggedIn: loggedIn, data: rows[0] });
+                }
+                else {
+                    res.render(__dirname + '/views/error');
+                }
+            });
+            connection.end();
+        }
+        else {
+            res.redirect('/login');
+        }
+    });
+    app.post('/bills/pay', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            var name_4 = req.user.firstname;
+            var userid = req.user.id;
+            console.log(req.body);
+            var queryString = "UPDATE Bills SET paid = 1, datePaid = '" + req.body.datepaid + "', paymentType = '" + req.body.paymenttype + "' WHERE id = '" + req.body.id + "';";
+            var connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+            connection.connect();
+            connection.query(queryString, function (err, rows) {
+                if (err) {
+                    console.log(err);
+                    res.render(__dirname + "/views/error");
+                }
+                else {
+                    res.redirect('/bills/unpaid');
+                }
+            });
+        }
+    });
     app.get('/bills/create', function (req, res) {
         var loggedIn = req.isAuthenticated();
         if (loggedIn) {
-            res.render(__dirname + '/views/createbill', { creditor: req.user });
+            res.render(__dirname + '/views/createbill', { creditor: req.user, loggedIn: loggedIn });
         }
         else {
             res.redirect('/login');
@@ -217,6 +271,15 @@ function setupRoutes(app) {
             res.redirect('/login');
         }
     });
+    app.get('/bills/dues/history', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            res.render(__dirname + '/views/paymenthistory', { loggedIn: loggedIn });
+        }
+        else {
+            res.redirect('/login');
+        }
+    });
     app.get('/api/users', function (req, res) {
         var loggedIn = req.isAuthenticated();
         if (loggedIn) {
@@ -236,12 +299,13 @@ function setupRoutes(app) {
             res.send('You are not authorized to view this page');
         }
     });
-    app.get('/api/bills/dues', function (req, res) {
+    app.post('/api/bills/dues/pay', function (req, res) {
         var loggedIn = req.isAuthenticated();
         if (loggedIn) {
-            var name_3 = req.user.firstname;
-            var userid_2 = req.user.id;
-            var queryString = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"';
+            var dueID = req.body.id;
+            var name_5 = req.user.firstname;
+            var userid_3 = req.user.id;
+            var queryString = 'UPDATE DUES SET paid = 1, datePaid = NOW() WHERE id = "' + req.body.id + '";';
             var connection_4 = mysql.createConnection({
                 host: 'localhost',
                 user: 'root',
@@ -249,20 +313,80 @@ function setupRoutes(app) {
             });
             connection_4.connect();
             connection_4.query(queryString, function (err, rows) {
-                var due = 0;
-                var owed = 0;
-                var totalAmount = 0;
-                rows.forEach(function (row) {
-                    if (row.debtor_id == userid_2) {
-                        due += parseFloat(row.amount);
-                    }
-                    else {
-                        owed += parseFloat(row.amount);
-                    }
-                });
-                totalAmount = due - owed;
-                res.json({ display: "hide", loggedIn: loggedIn, name: name_3, dues: rows, userid: userid_2, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount });
+                if (err) {
+                    throw err;
+                }
+                else {
+                    var queryStringTwo = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"';
+                    connection_4.query(queryStringTwo, function (err, rows) {
+                        if (err) {
+                            throw err;
+                        }
+                        else {
+                            var due_1 = 0;
+                            var owed_1 = 0;
+                            var totalAmount = 0;
+                            rows.forEach(function (row) {
+                                if (row.debtor_id == userid_3) {
+                                    due_1 += parseFloat(row.amount);
+                                }
+                                else {
+                                    owed_1 += parseFloat(row.amount);
+                                }
+                            });
+                            totalAmount = due_1 - owed_1;
+                            res.json({ display: "hide", loggedIn: loggedIn, name: name_5, dues: rows, userid: userid_3, due: due_1.toFixed(2), owed: owed_1.toFixed(2), totalAmount: totalAmount });
+                        }
+                    });
+                }
                 connection_4.end();
+            });
+        }
+        else {
+            res.redirect('/login');
+        }
+    });
+    app.post('/api/bills/dues/accept', function (req, res) {
+        var loggedIn = req.isAuthenticated();
+        if (loggedIn) {
+            var dueID = req.body.id;
+            var name_6 = req.user.firstname;
+            var userid_4 = req.user.id;
+            var queryString = 'UPDATE DUES SET paymentAccepted = 1, dateAccepted = NOW() WHERE id = "' + req.body.id + '";';
+            var connection_5 = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+            connection_5.connect();
+            connection_5.query(queryString, function (err, rows) {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    var queryStringTwo = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"';
+                    connection_5.query(queryStringTwo, function (err, rows) {
+                        if (err) {
+                            throw err;
+                        }
+                        else {
+                            var due_2 = 0;
+                            var owed_2 = 0;
+                            var totalAmount = 0;
+                            rows.forEach(function (row) {
+                                if (row.debtor_id == userid_4) {
+                                    due_2 += parseFloat(row.amount);
+                                }
+                                else {
+                                    owed_2 += parseFloat(row.amount);
+                                }
+                            });
+                            totalAmount = due_2 - owed_2;
+                            res.json({ display: "hide", loggedIn: loggedIn, name: name_6, dues: rows, userid: userid_4, due: due_2.toFixed(2), owed: owed_2.toFixed(2), totalAmount: totalAmount });
+                        }
+                    });
+                }
+                connection_5.end();
             });
         }
         else {

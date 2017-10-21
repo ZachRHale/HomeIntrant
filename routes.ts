@@ -134,6 +134,7 @@ export default function setupRoutes(app: express.Application) {
 
         if (loggedIn) {
             let name = req.user.firstname
+            let userid = req.user.id
             let connection = mysql.createConnection({
                 host: 'localhost',
                 user: 'root',
@@ -148,7 +149,7 @@ export default function setupRoutes(app: express.Application) {
 
                 } else {
                     if (rows != undefined) {
-                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name })
+                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name, userid:userid })
                     }
                 }
             })
@@ -200,7 +201,68 @@ export default function setupRoutes(app: express.Application) {
 
     })
 
+    app.get('/bills/pay/:id', (req, res) => {
 
+        let loggedIn = req.isAuthenticated()
+        
+        if (loggedIn){
+            let name = req.user.firstname
+            let userid = req.user.id
+
+            let queryString = "SELECT * FROM Bills WHERE id = '" + req.params.id + "';"
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+    
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+                if (rows.length == 0) {
+                    res.render(__dirname + '/views/404', {loggedIn: loggedIn, name: name})
+                }
+                else if(rows[0].owner == req.user.id) {
+                    res.render(__dirname + '/views/paybill', { loggedIn:loggedIn, data: rows[0] })
+                } else {
+                    res.render(__dirname + '/views/error')
+                }
+            })
+    
+            connection.end()
+        } else {
+            res.redirect('/login')
+        }
+
+    })
+
+    app.post('/bills/pay', (req, res) => {
+
+        let loggedIn = req.isAuthenticated()
+        
+        if (loggedIn){
+            let name = req.user.firstname
+            let userid = req.user.id
+            console.log(req.body)
+
+            let queryString = "UPDATE Bills SET paid = 1, datePaid = '" + req.body.datepaid + "', paymentType = '" + req.body.paymenttype + "' WHERE id = '" + req.body.id + "';"
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+    
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+                if (err) {
+                    console.log(err)
+                    res.render(__dirname + "/views/error")
+                } else {
+                    res.redirect('/bills/unpaid')
+                }
+            })
+        }
+    })
+            
 
 
     app.get('/bills/create', (req, res) => {
@@ -208,7 +270,7 @@ export default function setupRoutes(app: express.Application) {
 
         if (loggedIn) {
 
-            res.render(__dirname + '/views/createbill', { creditor: req.user})
+            res.render(__dirname + '/views/createbill', { creditor: req.user, loggedIn:loggedIn })
         } else {
             res.redirect('/login')
         }
@@ -237,7 +299,7 @@ export default function setupRoutes(app: express.Application) {
                 if (err) {
 
                 } else {
-                    
+
                     let query = createDues(billid, req)
                     connection.query(query, (err, rows: Array<any>) => {
                         if (err) {
@@ -252,6 +314,16 @@ export default function setupRoutes(app: express.Application) {
                 }
                 connection.end()
             })
+        } else {
+            res.redirect('/login')
+        }
+    })
+
+    app.get('/bills/dues/history', (req,res) => {
+        let loggedIn = req.isAuthenticated()
+        
+        if (loggedIn) {
+            res.render(__dirname + '/views/paymenthistory', { loggedIn:loggedIn })
         } else {
             res.redirect('/login')
         }
@@ -276,18 +348,19 @@ export default function setupRoutes(app: express.Application) {
                 res.json(JSON.stringify(rows))
                 connection.end()
             });
-            
+
         } else {
             res.send('You are not authorized to view this page')
         }
     })
 
-    app.get('/api/bills/dues', (req, res) => {
+    app.post('/api/bills/dues/pay', (req, res) => {
         let loggedIn = req.isAuthenticated()
         if (loggedIn) {
-            let name = req.user.firstname
+            let dueID: string = req.body.id
+            let name: string = req.user.firstname
             let userid = req.user.id
-            let queryString = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"'
+            let queryString = 'UPDATE DUES SET paid = 1, datePaid = NOW() WHERE id = "' + req.body.id + '";'
 
             let connection = mysql.createConnection({
                 host: 'localhost',
@@ -297,21 +370,83 @@ export default function setupRoutes(app: express.Application) {
 
             connection.connect()
             connection.query(queryString, (err, rows: Array<any>) => {
-                let due: number = 0
-                let owed: number = 0
-                let totalAmount: number = 0
 
-                rows.forEach((row) => {
-                    if (row.debtor_id == userid) {
-                        due += parseFloat(row.amount)
-                    } else {
-                        owed += parseFloat(row.amount)
-                    }
-                })
+                if (err) { throw err }
+                else {
+                    let queryStringTwo = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"'
 
-                totalAmount = due - owed
+                    connection.query(queryStringTwo, (err, rows: Array<any>) => {
+                        if (err) { throw err }
+                        else {
+                            let due: number = 0
+                            let owed: number = 0
+                            let totalAmount: number = 0
 
-                res.json({ display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount })
+                            rows.forEach((row) => {
+                                if (row.debtor_id == userid) {
+                                    due += parseFloat(row.amount)
+                                } else {
+                                    owed += parseFloat(row.amount)
+                                }
+                            })
+
+                            totalAmount = due - owed
+
+                            res.json({ display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount })
+                        }
+                    });
+                }
+
+                connection.end()
+            })
+        } else {
+            res.redirect('/login')
+        }
+    })
+
+    app.post('/api/bills/dues/accept', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+        if (loggedIn) {
+            let dueID: string = req.body.id
+            let name: string = req.user.firstname
+            let userid = req.user.id
+            let queryString = 'UPDATE DUES SET paymentAccepted = 1, dateAccepted = NOW() WHERE id = "' + req.body.id + '";'
+
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+
+                if (err) { throw err }
+                else {
+                    let queryStringTwo = 'SELECT * FROM v_dues_information WHERE debtor_id = "' + req.user.id + '" OR creditor_id = "' + req.user.id + '"'
+
+                    connection.query(queryStringTwo, (err, rows: Array<any>) => {
+                        if (err) { throw err }
+                        else {
+                            let due: number = 0
+                            let owed: number = 0
+                            let totalAmount: number = 0
+
+                            rows.forEach((row) => {
+                                if (row.debtor_id == userid) {
+                                    due += parseFloat(row.amount)
+                                } else {
+                                    owed += parseFloat(row.amount)
+                                }
+                            })
+
+                            totalAmount = due - owed
+
+                            res.json({ display: "hide", loggedIn: loggedIn, name: name, dues: rows, userid: userid, due: due.toFixed(2), owed: owed.toFixed(2), totalAmount: totalAmount })
+                        }
+                    });
+                }
+
                 connection.end()
             })
         } else {

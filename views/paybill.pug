@@ -1,49 +1,40 @@
 html
   include head.pug
   
-  body(class="text-center" id="create-bill")
-    form(method="post" action="/bills/create")
-            div(class="form-group")
-                label(class="titlefield" for="type") 
-                    h3 Bill Type
-                select(style="position:relative" name = "type" id = "type" class="form-control")
-                    option(value="electricy") Electricity
-                    option(value="water") Water
-                    option(value="spectrum") Spectrum
-                    option(value="rent") Rent
-            div(class="form-group")
-                label(class="titlefield" for="amount") 
-                    h3 Amount
-                input(type='number' min="0.01" step="0.01" value="0.00" class="form-control" name = "amount" id = "amount")  
+  body(class="text-center" id="pay-bill")
 
-            div(class="form-group")
-                label(class="titlefield" for="duedate") 
-                    h3 Due Date
-                input(type='date' class="form-control" name = "duedate" id = "duedate") 
+   
+    form(method="post" action="/bills/pay")
+        h2 Bill Information
+        input(type="hidden" name="id" value=data.id)
+            
+        table(class="table table-striped text-center" id="bill-details")
+            tr
+                td Due Date
+                td=data.duedate.toDateString()
+            tr 
+                td Type
+                td=data.type[0].toUpperCase() + data.type.substring(1)
+            tr 
+                td Amount
+                td $#{data.amount}
+        hr(style="width:30%")
+        div(class="form-group")
+            label(class="titlefield" for="datepaid") 
+                h3 Date Paid
+            input(type='date' class="form-control" name = "datepaid" id = "datepaid")  
 
-            div(class="form-group")
-                label(class="titlefield" for="users") 
-                    h3 Users on Bill
-            div(id="bill-users")
-                div(class="user-bill creditor")
-                    span #{creditor.firstname} #{creditor.lastname}
-                    div(class="role") owner
-                    input(type='hidden' style="display:inline-block; width:auto" readonly class="form-control" name = "users[creditor][0]" value = creditor.id)  
-                div(style="display:inline-block; border:1px solid black; margin: 10px; padding:10px; border-radius:10px" id="add-user-bill-split")
-                    i(class="fa fa-plus" aria-hidden="true")
+        div(class="form-group")
+            label(class="titlefield" for="payment-type") 
+                h3 Payment Type
+            select(style="position:relative" name = "paymenttype" id = "paymenttype" class="form-control")
+                option(value="cash") Cash
+                option(value="credit") Credit
+                option(value="debit") Debit
+                option(value="check") Check
+        div
+            button(type="submit" class="btn" id="submitBtn") Pay Bill
 
-            div
-                button(type="submit" class="btn" id="submitBtn") Create Bill
-
-    script(src='/js/createbill.js' type="text/javascript")
-
-
-
-
-
-        
-        
-                  
   include footer.pug
           
   

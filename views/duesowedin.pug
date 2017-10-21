@@ -3,6 +3,12 @@ table(class="table table-striped text-center")
     each due in dues
         if (userid == due.creditor_id)
             tr(class="due")  
-                td #{due.debtor_firstname} owes you #{due.amount.toFixed(2)} for #{due.type}
-                    h2(class="fa fa-thumbs-up" aria-hidden="true" style="color:green;margin-left:10px;")
+                if (due.paid == 1)
+                    td #{due.debtor_firstname} paid you #{due.amount.toFixed(2)} for #{due.type}
+                        button(class="btn btn-success accept-payment" onclick="acceptPayment('" + due.id + "')") Accept
+                else
+                    td #{due.debtor_firstname} owes you #{due.amount.toFixed(2)} for #{due.type}
+                        h2(class="fa fa-thumbs-up" aria-hidden="true" style="color:green;margin-left:10px;")
+
+
 h2(style="color:green") +$#{owed}

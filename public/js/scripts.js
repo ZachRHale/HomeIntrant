@@ -108,4 +108,28 @@ $(document).ready(function () {
             this.available.push(user)
         }
     }
+
+    payDue = function(id){
+        $.ajax({
+            type: "POST",
+            url: "/api/bills/dues/pay",
+            data: { "id" : id },
+            success: function(data){
+                let html = renderDuesOwedOut(data)
+                $('#dues-you-owe').html(html)
+            }
+        });
+    }
+
+    acceptPayment = function(id){
+        $.ajax({
+            type: "POST",
+            url: "/api/bills/dues/accept",
+            data: { "id" : id },
+            success: function(data){
+                let html = renderDuesOwedIn(data)
+                $('#dues-owed-to-you').html(html)
+            }
+        });
+    }
 })

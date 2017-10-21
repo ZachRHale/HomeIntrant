@@ -48,6 +48,13 @@
     padding:20px;
     margin:15px;
     border-radius:10px;
+    height:224px;
+    vertical-align:text-top;
+}
+
+#bill-details {
+    width:50%;
+    margin:0 auto;
 }
 
 #loginHeader {
@@ -118,14 +125,22 @@
     margin-left:20px;
 }
 
+.pay-bill a {
+    color:white;
+    text-decoration: none;
+}
+
+.accept-payment {
+    margin-left:10px;
+}
+
 #submitBtn {
     margin-top:30px;
 }
 
 footer {
-    position: absolute;
-    bottom:0;
-    left:0;
+    height:30px;
+    
     width:100%;
     background-color:white
 }
@@ -149,4 +164,8 @@ footer {
 
 body {
     position:relative;
+    min-height: 400px;
+    margin-bottom: 100px;
+    clear: both;
+
 }

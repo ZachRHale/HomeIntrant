@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "description": "An intranet to help us organize our home",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "buildViews": "pug --client --name renderDuesOwedIn views/duesowedin.pug --out ./public/js/pugviews;pug --client --name renderDuesOwedOut views/duesowedout.pug --out ./public/js/pugviews;"
+  },
   "keywords": [],
   "author": "GitHub",
   "license": "CC0-1.0",

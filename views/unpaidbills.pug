@@ -18,8 +18,11 @@ html
                             i(class="fa fa-home" aria-hidden="true")
                     h4= (parseInt(new Date(bill.duedate).getMonth()) + 1) + " / " + new Date(bill.duedate).getDate() + " / " + new Date(bill.duedate).getFullYear()
                     h1="$" + parseFloat(bill.amount).toFixed(2) + " " + bill.currency
+                    if (bill.owner == userid)
+                        button(class="btn btn-success pay-bill")
+                            a(href="/bills/pay/" + bill.id) Pay Bill
                         
                        
         a(href="/") Return to Home
 
-    include footer.pug
+include footer.pug

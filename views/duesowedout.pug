@@ -4,6 +4,10 @@ table(class="table table-striped text-center")
         if (userid == due.debtor_id)
             tr(class="due")  
                 td You owe #{due.creditor_firstname} #{due.amount.toFixed(2)} for #{due.type} 
-                    span(emoji="pile-of-poo" emoji-tone="light")
-                    button(class="btn btn-success pay-due") Pay
+                    
+                    if (due.paid == 1)
+                        i(style="color:red;font-size:12px") Acceptance Pending
+                    else
+                        span(emoji="pile-of-poo" emoji-tone="light")
+                        button(class="btn btn-success pay-due" onclick="payDue('" + due.id + "')") Pay
 h2(style="color:red") -$#{due}

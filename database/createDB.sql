@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Users (
  );
  
  
- CREATE TABLE IF NOT EXISTS Bills (
+CREATE TABLE IF NOT EXISTS Bills (
 	id varchar(255) NOT NULL,
     duedate datetime NOT NULL, 
 	type varchar(255) NOT NULL,
@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS Users (
     currencySystem varchar(255), 
     amount varchar(255),
     paid boolean,
+    datePaid datetime,
+    paymentType varchar(255),
     owner varchar(255),
     PRIMARY KEY (id),
     UNIQUE (id)
@@ -35,13 +37,21 @@ CREATE TABLE IF NOT EXISTS Users (
     debtor varchar(255) NOT NULL, 
 	creditor varchar(255) NOT NULL,
     amount float,
-    paid boolean,
+    paid boolean, 
+    paymentAccepted boolean,
+    datePaid datetime,
+    dateAccepted datetime,
     PRIMARY KEY (id),
     foreign key (bill) references Bills(id)
  );
  
+ 
 CREATE VIEW v_dues_information AS
-SELECT d.bill,
+SELECT 
+d.id,
+d.bill,
+d.paid,
+d.paymentAccepted,
 b.type,
 d.amount,
 b.currency,
@@ -57,4 +67,4 @@ FROM Dues d
 LEFT JOIN Users u ON d.debtor = u.id
 LEFT JOIN Users u2 ON d.creditor = u2.id
 LEFT JOIN Bills b ON b.id = d.bill
-WHERE d.paid = 0
+WHERE d.paid = 0 OR d.paymentAccepted = 0
