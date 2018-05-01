@@ -26,6 +26,7 @@ let httpsOptions = {
 let app = createApp()
 setupRoutes(app)
 
+
 app.set('port_https', 3443); // make sure to use the same port as above, or better yet, use the same variable
 
 // Secure traffic only

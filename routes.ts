@@ -1,13 +1,17 @@
 import * as Guid from 'Guid'
 import { User } from './models/User'
 import { Bill, BillType } from './models/Bill'
+import { Calendar } from './google-calendar'
 import * as randomstring from 'randomstring'
 import * as crypto from 'crypto'
 import * as express from 'express'
 import * as mysql from 'mysql'
 import { createDues } from './utility'
+import googlepis from 'googleapis'
+
 
 export default function setupRoutes(app: express.Application) {
+
     app.get('/', (req, res) => {
         let loggedIn = req.isAuthenticated()
         if (loggedIn) {
@@ -128,6 +132,7 @@ export default function setupRoutes(app: express.Application) {
         res.render(__dirname + '/views/login', { display: "hide", loggedIn: loggedIn })
     })
 
+    // Bills //
     app.get('/bills/unpaid', (req, res) => {
 
         let loggedIn = req.isAuthenticated()
@@ -149,7 +154,7 @@ export default function setupRoutes(app: express.Application) {
 
                 } else {
                     if (rows != undefined) {
-                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name, userid:userid })
+                        res.render(__dirname + '/views/unpaidbills', { bills: rows, loggedIn: loggedIn, name: name, userid: userid })
                     }
                 }
             })
@@ -197,15 +202,21 @@ export default function setupRoutes(app: express.Application) {
         }
     })
 
-    app.post('/bills/dues/pay', (req, res) => {
+    app.get('/bills/dues/history', (req, res) => {
+        let loggedIn = req.isAuthenticated()
 
+        if (loggedIn) {
+            res.render(__dirname + '/views/duepaymenthistory', { loggedIn: loggedIn, name: name })
+        } else {
+            res.redirect('/login')
+        }
     })
 
     app.get('/bills/pay/:id', (req, res) => {
 
         let loggedIn = req.isAuthenticated()
-        
-        if (loggedIn){
+
+        if (loggedIn) {
             let name = req.user.firstname
             let userid = req.user.id
 
@@ -215,19 +226,19 @@ export default function setupRoutes(app: express.Application) {
                 user: 'root',
                 database: 'dunedinhouse'
             });
-    
+
             connection.connect()
             connection.query(queryString, (err, rows: Array<any>) => {
                 if (rows.length == 0) {
-                    res.render(__dirname + '/views/404', {loggedIn: loggedIn, name: name})
+                    res.render(__dirname + '/views/404', { loggedIn: loggedIn, name: name })
                 }
-                else if(rows[0].owner == req.user.id) {
-                    res.render(__dirname + '/views/paybill', { loggedIn:loggedIn, data: rows[0] })
+                else if (rows[0].owner == req.user.id) {
+                    res.render(__dirname + '/views/paybill', { loggedIn: loggedIn, data: rows[0], name: name})
                 } else {
                     res.render(__dirname + '/views/error')
                 }
             })
-    
+
             connection.end()
         } else {
             res.redirect('/login')
@@ -238,8 +249,10 @@ export default function setupRoutes(app: express.Application) {
     app.post('/bills/pay', (req, res) => {
 
         let loggedIn = req.isAuthenticated()
-        
-        if (loggedIn){
+        let name = req.user.firstname
+
+
+        if (loggedIn) {
             let name = req.user.firstname
             let userid = req.user.id
             console.log(req.body)
@@ -250,7 +263,7 @@ export default function setupRoutes(app: express.Application) {
                 user: 'root',
                 database: 'dunedinhouse'
             });
-    
+
             connection.connect()
             connection.query(queryString, (err, rows: Array<any>) => {
                 if (err) {
@@ -262,15 +275,15 @@ export default function setupRoutes(app: express.Application) {
             })
         }
     })
-            
-
 
     app.get('/bills/create', (req, res) => {
         let loggedIn = req.isAuthenticated()
+        let name = req.user.firstname
+
 
         if (loggedIn) {
 
-            res.render(__dirname + '/views/createbill', { creditor: req.user, loggedIn:loggedIn })
+            res.render(__dirname + '/views/createbill', { creditor: req.user, loggedIn: loggedIn , name:name })
         } else {
             res.redirect('/login')
         }
@@ -282,8 +295,6 @@ export default function setupRoutes(app: express.Application) {
         if (loggedIn) {
             let billid = Guid.create()
             let currency = "USD"
-            console.log(req.body.users)
-            console.log(req.user)
 
             let queryString = 'INSERT INTO Bills (id, duedate, type, currency, amount, paid, owner) VALUES ("' + billid + '","' + req.body.duedate + '","' + req.body.type + '","' + currency + '","' + req.body.amount + '", false, "' + req.user.id + '")'
 
@@ -319,16 +330,96 @@ export default function setupRoutes(app: express.Application) {
         }
     })
 
-    app.get('/bills/dues/history', (req,res) => {
+    app.get('/bills/history', (req, res) => {
         let loggedIn = req.isAuthenticated()
-        
+        let name = req.user.firstname
+
+
         if (loggedIn) {
-            res.render(__dirname + '/views/paymenthistory', { loggedIn:loggedIn })
+            let name = req.user.firstname
+            let userid = req.user.id
+            let queryString = 'SELECT * FROM BILLS WHERE paid = 1;'
+
+            let connection = mysql.createConnection({
+                host: 'localhost',
+                user: 'root',
+                database: 'dunedinhouse'
+            });
+
+            connection.connect()
+            connection.query(queryString, (err, rows: Array<any>) => {
+                if (err) {
+                    res.render(__dirname + '/views/error', { loggedIn: loggedIn, name:name })
+                } else {
+                    rows.forEach( (bill) => {
+                        let datePaid = new Date(bill.datePaid)
+                        bill.datePaid = datePaid.toLocaleDateString()
+
+                        let dueDate = new Date(bill.duedate)
+                        bill.duedate = dueDate.toLocaleDateString()
+                    })
+                    res.render(__dirname + '/views/billpaymenthistory', { bills: rows, loggedIn: loggedIn, name:name })
+                    console.log(rows)
+                }
+                connection.end()                
+            })
+        }
+    })
+
+    // Calendar //
+    app.get('/calendar/event/create', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+        let name = req.user.firstname
+        let googleCalendar = new Calendar()
+        let googleEvent:gapi.client.calendar.Event
+        let startDate = new Date()
+        let endDate = new Date()
+
+        startDate.setHours(12)
+        startDate.setMinutes(20)
+        startDate.setFullYear(2018)
+        startDate.setDate(4)
+        startDate.setMonth(0)
+
+        googleEvent.start.dateTime = startDate.toISOString()
+        googleEvent.start.timeZone = "America/New_York"
+
+        startDate.setHours(15)
+        startDate.setMinutes(30)
+        startDate.setFullYear(2018)
+        startDate.setDate(6)
+        startDate.setMonth(0)
+
+        googleEvent.end.dateTime = endDate.toISOString()
+        googleEvent.end.timeZone = "America/New_York"
+
+        googleEvent.description = "This is an event entered from the API"
+        googleEvent.summary = "Something Else"
+        googleEvent.location = "559 Vine Avenue, Dunedin, FL 34698"
+
+
+        if (loggedIn) {
+            // googleCalendar.createNewEvent(startDate, endDate, googleEvent)
+            res.render(__dirname + '/views/createevent', {loggedIn: loggedIn, name:name})
         } else {
             res.redirect('/login')
         }
     })
 
+    app.post('/calendar/event/create', (req, res) => {
+        let loggedIn = req.isAuthenticated()
+        let googleCalendar = new Calendar()
+
+        if (loggedIn) {
+            
+        } else {
+            res.redirect('/login')
+        }
+    })
+
+
+
+    // API //
 
     app.get('/api/users', (req, res) => {
         let loggedIn = req.isAuthenticated()

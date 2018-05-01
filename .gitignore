@@ -2,3 +2,4 @@
 private.key
 certificate.pem
 cert.csr
+client_secret.json

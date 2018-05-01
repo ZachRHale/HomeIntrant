@@ -57,6 +57,11 @@
     margin:0 auto;
 }
 
+#paid-bills {
+    width:70%;
+    margin:0 auto;
+}
+
 #loginHeader {
     padding:20px;
     position:absolute;
@@ -140,8 +145,9 @@
 
 footer {
     height:30px;
-    
     width:100%;
+    clear:both;
+    margin-top:10%;
     background-color:white
 }
 

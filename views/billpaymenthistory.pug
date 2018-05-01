@@ -1,0 +1,19 @@
+html
+  include head.pug
+  
+  body(class="text-center" id="payment-history")
+    h2 Bill Payment History
+    table(class="table table-striped text-center" id="paid-bills")
+        th(class="text-center") Type
+        th(class="text-center") Amount
+        th(class="text-center") Due Date
+        th(class="text-center") Paid Date
+        each bill in bills
+            tr(class="text-center")
+                td=bill.type
+                td $#{bill.amount}
+                td=bill.duedate
+                td=bill.datePaid
+  include footer.pug
+          
+  
